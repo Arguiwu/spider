@@ -1,0 +1,24 @@
+{
+  "name": "douban",
+  "version": "1.0.0",
+  "description": "",
+  "main": "douban.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhaoxm/spider.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhaoxm/spider/issues"
+  },
+  "homepage": "https://github.com/zhaoxm/spider#readme",
+  "dependencies": {
+    "cheerio": "^0.22.0",
+    "mongoose": "^4.6.6",
+    "superagent": "^2.3.0"
+  }
+}
