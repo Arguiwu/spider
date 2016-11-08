@@ -2,8 +2,8 @@ const superagent = require('superagent');
 const cheerio = require('cheerio');
 var getMovie = require('./spider.js');
 
-var url = 'https://movie.douban.com/tag/2015';
 var page = 0;
+var url = 'https://movie.douban.com/tag/2015?start=' + page * 20 + '&type=T';
 getLink(url);
 
 function getLink(url) {
@@ -29,7 +29,7 @@ function getLink(url) {
             var listCount = $('.article > div > table .pl2 > a').length;
             $('.article > div > table .pl2 > a').each(function(i, elem) {
                     var link = $(this).attr('href');
-                    console.log($(this).text() + link);
+                    // console.log($(this).text() + link);
                     // 获取电影信息
                     getMovie(link);
                     if (i + 1 == listCount) {

@@ -1,11 +1,13 @@
 const superagent = require('superagent');
 const cheerio = require('cheerio');
 const mongoose = require('mongoose');
+const url = require('url');
 
 var MovieModel = require('./MovieSchema.js');
 
-function getMovie(url) {
-    superagent.get(url)
+function getMovie(urlLink) {
+    console.log(urlLink);
+    superagent.get(urlLink)
     .set({
         'Referer': 'https://movie.douban.com/subject_search?search_text=%E5%86%B0%E8%A1%80%E6%9A%B4&cat=1002',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36',
@@ -24,7 +26,8 @@ function getMovie(url) {
         var $ = cheerio.load(res.text);
         var movie = {};
         // _id
-        movie._id = $('#content .gtleft ul').children().last().find($('span[class="rec"]')).attr('id').split('-')[1];
+        var pathnames = url.parse(urlLink).pathname.split('/');
+        movie._id = pathnames[pathnames.length - 2];
         // 电影名
         var name = $('span[property="v:itemreviewed"]').text().split(' ');
         movie.zh_name = name[0];
@@ -108,9 +111,12 @@ function getMovie(url) {
         db.once('open', function() {
             MovieModel.findOne({ _id: movie._id }, function(err, res) {
                 if (res) {
-                    console.log(movie.zh_name + '    已经存在');
+                    // console.log(movie.zh_name + '    已经存在');
                     db.close();
                     return;
+                } else if($('#season').text()) {
+                    // console.log(movie.zh_name + '    电视剧不要～');
+                    db.close();
                 } else {
                     var movieEntity = new MovieModel(movie);
                     movieEntity.markModified('directors');
