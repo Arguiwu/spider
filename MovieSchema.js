@@ -2,13 +2,13 @@ var mongoose = require('mongoose');
 var db = mongoose.createConnection('localhost', 'Movie');
 
 var MovieSchema = new mongoose.Schema({
-    id: Number,
+    _id: Number,
     zh_name: String,
     foreign_name: String,
     image: String,
-    directors: [String],
-    scenarists: [String],
-    actors: [String],
+    directors: [mongoose.Schema.Types.Mixed],
+    scenarists: [mongoose.Schema.Types.Mixed],
+    actors: [mongoose.Schema.Types.Mixed],
     genres: [String],
     initialReleaseDate: [String],
     runtime: String,
@@ -17,6 +17,8 @@ var MovieSchema = new mongoose.Schema({
     recommendations: [mongoose.Schema.Types.Mixed],
     average: Number,
     tags: [String]
+}, {
+    _id: false
 });
 
 var MovieModel = db.model('t_movies', MovieSchema);
