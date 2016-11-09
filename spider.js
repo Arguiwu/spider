@@ -108,7 +108,7 @@ function getMovie(urlLink) {
         db.on('error', function() {
             console.log('连接错误');
         });
-        db.once('open', function() {
+        db.on('open', function() {
             MovieModel.findOne({ _id: movie._id }, function(err, res) {
                 if (res) {
                     // console.log(movie.zh_name + '    已经存在');
@@ -125,9 +125,9 @@ function getMovie(urlLink) {
                     movieEntity.markModified('imdb');
                     movieEntity.markModified('recommendations');
                     movieEntity.save(function(err) {
-                        console.log(movie.zh_name + '保存成功');
+                        // console.log(movie.zh_name + '保存成功');
                     });
-                    db.close();
+                    // db.close();
                 }
             })
         })
