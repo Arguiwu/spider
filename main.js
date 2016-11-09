@@ -3,7 +3,8 @@ const cheerio = require('cheerio');
 var getMovie = require('./spider.js');
 
 var page = 0;
-var url = 'https://movie.douban.com/tag/2015?start=' + page * 20 + '&type=T';
+var staticLink = 'https://movie.douban.com/tag/2013?start=';
+var url = staticLink + page * 20 + '&type=T';
 getLink(url);
 
 function getLink(url) {
@@ -34,7 +35,7 @@ function getLink(url) {
                     getMovie(link);
                     if (i + 1 == listCount) {
                         page = page + 1;
-                        url = 'https://movie.douban.com/tag/2015?start=' + page * 20 + '&type=T';
+                        url = staticLink + page * 20 + '&type=T';
                         getLink(url);
                     }
             });

@@ -6,7 +6,7 @@ const url = require('url');
 var MovieModel = require('./MovieSchema.js');
 
 function getMovie(urlLink) {
-    console.log(urlLink);
+    // console.log(urlLink);
     superagent.get(urlLink)
     .set({
         'Referer': 'https://movie.douban.com/subject_search?search_text=%E5%86%B0%E8%A1%80%E6%9A%B4&cat=1002',
