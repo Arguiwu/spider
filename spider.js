@@ -1,12 +1,8 @@
 const superagent = require('superagent');
 const cheerio = require('cheerio');
-const mongoose = require('mongoose');
 const url = require('url');
 
-var MovieModel = require('./MovieSchema.js');
-
-function getMovie(urlLink) {
-    // console.log(urlLink);
+function getMovie(urlLink, save) {
     superagent.get(urlLink)
     .set({
         'Referer': 'https://movie.douban.com/subject_search?search_text=%E5%86%B0%E8%A1%80%E6%9A%B4&cat=1002',
@@ -96,41 +92,41 @@ function getMovie(urlLink) {
                 film.id = $(this).attr('href').slice(start + 8, end - 1);
                 movie.recommendations.push(film);
             })
-            // 评分
+        // 评分
         movie.average = $('strong[property="v:average"]').text();
         // 标签
         movie.tags = [];
         $('.tags-body a').each(function(i, elem) {
             movie.tags.push($(this).text());
         }) 
-        var db = mongoose.createConnection('localhost', 'Movie');
-        // db save
-        db.on('error', function() {
-            console.log('连接错误');
-        });
-        db.on('open', function() {
-            MovieModel.findOne({ _id: movie._id }, function(err, res) {
-                if (res) {
-                    // console.log(movie.zh_name + '    已经存在');
-                    db.close();
-                    return;
-                } else if($('#season').text()) {
-                    // console.log(movie.zh_name + '    电视剧不要～');
-                    db.close();
-                } else {
-                    var movieEntity = new MovieModel(movie);
-                    movieEntity.markModified('directors');
-                    movieEntity.markModified('scenarists');
-                    movieEntity.markModified('actors');
-                    movieEntity.markModified('imdb');
-                    movieEntity.markModified('recommendations');
-                    movieEntity.save(function(err) {
-                        // console.log(movie.zh_name + '保存成功');
-                    });
-                    // db.close();
+        // 语言
+        movie.languange = [];
+        // 地区
+        movie.region = [];
+        // 又名
+        movie.aka = [];
+        $('#info').children().each(function(i, elem) {
+            if ($(this).text().indexOf('语言') > -1 ) {
+                movie.language = $(this).next()['0'].prev.data.split('/');
+                for (var i = 0; i < movie.language.length; i++) {
+                    movie.language[i] = movie.language[i].replace(/\s+/g, '');
                 }
-            })
+            }
+            if ($(this).text().indexOf('制片国家') > -1 ) {
+                movie.region = $(this).next()['0'].prev.data.split('/');
+                for (var i = 0; i < movie.region.length; i++) {
+                    movie.region[i] = movie.region[i].replace(/\s+/g, '');
+                }
+            }
+            if ($(this).text().indexOf('又名') > -1 ) {
+                movie.aka = $(this).next()['0'].prev.data.split('/');
+                for (var i = 0; i < movie.aka.length; i++) {
+                    movie.aka[i] = movie.aka[i].replace(/\s+/g, '');
+                }
+            }
         })
+        // return movie;
+        save(movie, $);
     })
 }
 

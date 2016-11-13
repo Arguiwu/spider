@@ -1,22 +1,26 @@
-var mongoose = require('mongoose');
-var db = mongoose.createConnection('localhost', 'Movie');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const db = mongoose.createConnection('localhost', 'Movie');
 
-var MovieSchema = new mongoose.Schema({
+var MovieSchema = new Schema({
     _id: Number,
     zh_name: String,
     foreign_name: String,
     image: String,
-    directors: [mongoose.Schema.Types.Mixed],
-    scenarists: [mongoose.Schema.Types.Mixed],
-    actors: [mongoose.Schema.Types.Mixed],
+    directors: [{}],
+    scenarists: [{}],
+    actors: [{}],
     genres: [String],
     initialReleaseDate: [String],
     runtime: String,
     imdb: {},
     summary: String,
-    recommendations: [mongoose.Schema.Types.Mixed],
+    recommendations: [{}],
     average: Number,
-    tags: [String]
+    tags: [String],
+    language: [String],
+    region: [String],
+    aka: [String]
 }, {
     _id: false
 });
