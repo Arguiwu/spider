@@ -4,66 +4,74 @@ var getMovie = require('./spider.js');
 const mongoose = require('mongoose');
 const db = mongoose.createConnection('localhost', 'Movie');
 const MovieModel = require('./MovieSchema.js');
+const requestHeader = require('./header.js');
+var urlencode = require('urlencode');
 
 var page = 0;
-var year = 1940;
-var staticLink = 'https://movie.douban.com/tag/' + year + '?start=';
-var url = staticLink + page * 20 + '&type=T';
+var url;
+// 所有标签
+var tags = [];
+var tagsLength;
+var start = 4;
 
 // db save
 db.on('error', function() {
     console.log('连接错误');
 });
 db.on('open', function() {
-    getLink(url);
+    superagent.get('https://movie.douban.com/tag/')
+        .set(requestHeader)
+        .end(function(err, res) {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            var $ = cheerio.load(res.text);
+            $('.tagCol td a').each(function(i, elem) {
+                tags.push(urlencode($(this).text()));
+            })
+            tagsLength = tags.length;
+            url = 'https://movie.douban.com/tag/' + tags[start] + '?start=' + page * 20 + '&type=T';
+            getLink(url);
+        })
 })
 
 function getLink(url) {
     console.log(url);
     superagent.get(url)
-    .set({
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, sdch, br',
-        'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4',
-        'Cache-Control': 'max-age=0',
-        'Connection': 'keep-alive',
-        'Cookie': 'll="118124"; bid=fn-RmlYyWng; _ga=GA1.2.1994921951.1470050267; ct=y; __ads_session=zF3nPylR0Aha7pkFiwA=; ap=1; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1479051883%2C%22https%3A%2F%2Fwww.douban.com%2F%22%5D; _vwo_uuid_v2=B7BF2419FAC162BC07624ED70DA4E016|ca9450b179ebb65ef21ff14e960a416e; _pk_id.100001.4cf6=3a84fe7fdecfb7ec.1478178997.20.1479052900.1479048923.; _pk_ses.100001.4cf6=*; __utma=30149280.1994921951.1470050267.1479043908.1479051883.21; __utmb=30149280.0.10.1479051883; __utmc=30149280; __utmz=30149280.1478594157.12.3.utmcsr=movie.douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/; __utma=223695111.1992274825.1478178997.1479043908.1479051883.19; __utmb=223695111.0.10.1479051883; __utmc=223695111; __utmz=223695111.1478917251.16.4.utmcsr=douban.com|utmccn=(referral)|utmcmd=referral|utmcct=/',
-        'Host': 'movie.douban.com',
-        'Referer': 'https://movie.douban.com/tag/',
-        'Upgrade-Insecure-Requests': 1,
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.101 Safari/537.36',
-    })
-    .end(function(err, res) {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        var $ = cheerio.load(res.text);
-        var links = $('.article > div > table .pl2 > a');
-        var listCount = links.length;
-        if (!listCount) {
-            console.log(year + '年全部爬完');
-            setTimeout(function () {
-                year = year + 1;
-                page = 0;
-                staticLink = 'https://movie.douban.com/tag/' + year + '?start=';
-                url = staticLink + page * 20 + '&type=T';
-                getLink(url);
-            }, 20000);
-            return;
-        }
-        links.each(function(i, elem) {
-            // console.log($(this).text() + link);
-            if (i + 1 == listCount) {
-                page = page + 1;
-                url = staticLink + page * 20 + '&type=T';
-                getLink(url);
+        .set(requestHeader)
+        .end(function(err, res) {
+            if (err) {
+                console.log(err);
                 return;
             }
-            var link = $(this).attr('href');
-            var movie = getMovie(link, save);
+            var $ = cheerio.load(res.text);
+            var links = $('.item .pl2 a');
+            var listCount = links.length;
+            if (!listCount) {
+                setTimeout(function() {
+                    if (start <= tagsLength) {
+                        start = start + 1;
+                        page = 0;
+                        url = 'https://movie.douban.com/tag/' + tags[start] + '?start=' + page * 20 + '&type=T';
+                        getLink(url);
+                    } else {
+                        console.log('全部标签已经爬完');
+                    }
+                }, 20000);
+                return;
+            }
+            links.each(function(i, elem) {
+                if (i + 1 == listCount) {
+                    page = page + 1;
+                    url = 'https://movie.douban.com/tag/' + tags[start] + '?start=' + page * 20 + '&type=T';
+                    getLink(url);
+                    return;
+                }
+                var link = $(this).attr('href');
+                var movie = getMovie(link, save);
+            });
         });
-    });
 }
 
 function save(movie, $) {
@@ -90,6 +98,3 @@ function save(movie, $) {
         }
     })
 }
-
-
-
