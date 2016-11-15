@@ -12,7 +12,7 @@ var url;
 // 所有标签
 var tags = [];
 var tagsLength;
-var start = 4;
+var start = 14;
 
 // db save
 db.on('error', function() {
@@ -40,9 +40,13 @@ function getLink(url) {
     console.log(url);
     superagent.get(url)
         .set(requestHeader)
+        .timeout(5000)
         .end(function(err, res) {
             if (err) {
-                console.log(err);
+                if (err.timeout) {
+                    console.log('超时');
+                    getLink(url);
+                }
                 return;
             }
             var $ = cheerio.load(res.text);
@@ -77,6 +81,7 @@ function getLink(url) {
 function save(movie, $) {
     MovieModel.findOne({ _id: movie._id }, function(err, res) {
         if (err) {
+            console.log('保存问题')
             console.log(err);
         }
         if (res) {

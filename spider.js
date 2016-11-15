@@ -8,6 +8,8 @@ function getMovie(urlLink, save) {
     .set(requestHeader)
     .end(function(err, res) {
         if (err) {
+            console.log('get movie error')
+            console.log(urlLink);
             console.log(err);
             return;
         }
