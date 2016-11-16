@@ -12,7 +12,7 @@ var url;
 // 所有标签
 var tags = [];
 var tagsLength;
-var start = 14;
+var start = 0;
 
 // db save
 db.on('error', function() {
@@ -98,7 +98,7 @@ function save(movie, $) {
             movieEntity.markModified('imdb');
             movieEntity.markModified('recommendations');
             movieEntity.save(function(error) {
-                // console.log(movie.zh_name + '保存成功');
+                console.log(movie.zh_name + '保存成功');
             });
         }
     })
