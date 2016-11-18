@@ -37,7 +37,7 @@ db.on('open', function() {
 })
 
 function getLink(url) {
-    console.log(url);
+    // console.log(url);
     superagent.get(url)
         .set(requestHeader)
         .timeout(5000)
@@ -58,6 +58,7 @@ function getLink(url) {
                         start = start + 1;
                         page = 0;
                         url = 'https://movie.douban.com/tag/' + tags[start] + '?start=' + page * 20 + '&type=T';
+                        console.log(tags[start] + '全部标签已经爬完');
                         getLink(url);
                     } else {
                         console.log('全部标签已经爬完');
