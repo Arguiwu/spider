@@ -88,11 +88,13 @@ function getMovie(urlLink, save) {
             })
         // 评分
         movie.average = $('strong[property="v:average"]').text();
+        // 评价人数
+        movie.votes = $('span[property="v:votes"]').text();
         // 标签
         movie.tags = [];
         $('.tags-body a').each(function(i, elem) {
             movie.tags.push($(this).text());
-        }) 
+        })
         // 语言
         movie.languange = [];
         // 地区

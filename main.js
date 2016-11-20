@@ -7,7 +7,7 @@ const MovieModel = require('./MovieSchema.js');
 const requestHeader = require('./header.js');
 var urlencode = require('urlencode');
 
-var page = 0;
+var page = 131;
 var url;
 // 所有标签
 var tags = [];
@@ -40,13 +40,13 @@ function getLink(url) {
     // console.log(url);
     superagent.get(url)
         .set(requestHeader)
-        .timeout(5000)
+        .timeout(1000 * 10)
         .end(function(err, res) {
             if (err) {
                 if (err.timeout) {
                     console.log('超时');
-                    getLink(url);
                 }
+                getLink(url);
                 return;
             }
             var $ = cheerio.load(res.text);
@@ -99,7 +99,7 @@ function save(movie, $) {
             movieEntity.markModified('imdb');
             movieEntity.markModified('recommendations');
             movieEntity.save(function(error) {
-                console.log(movie.zh_name + '保存成功');
+                // console.log(movie.zh_name + '保存成功');
             });
         }
     })

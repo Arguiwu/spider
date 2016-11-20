@@ -20,7 +20,8 @@ var MovieSchema = new Schema({
     tags: [String],
     language: [String],
     region: [String],
-    aka: [String]
+    aka: [String],
+    votes: Number
 }, {
     _id: false
 });
