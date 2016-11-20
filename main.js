@@ -7,7 +7,7 @@ const MovieModel = require('./MovieSchema.js');
 const requestHeader = require('./header.js');
 var urlencode = require('urlencode');
 
-var page = 131;
+var page = 0;
 var url;
 // 所有标签
 var tags = [];
@@ -37,7 +37,7 @@ db.on('open', function() {
 })
 
 function getLink(url) {
-    // console.log(url);
+    console.log(url);
     superagent.get(url)
         .set(requestHeader)
         .timeout(1000 * 10)
